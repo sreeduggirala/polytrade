@@ -21,13 +21,15 @@ pip install -r requirements.txt
 ```
 
 ### 3. Setup environment variables
-```
+Copy `.env.example` to `.env` and configure:
+```bash
+# Polymarket Trading
 PRIVATE_KEY=0xabc123...
+POLYMARKET_PROXY_ADDRESS=0xdef456...
+POLYMARKET_SIGNATURE_TYPE=1
 
-TG_API_ID=1234567
-TG_API_HASH=abcdef1234567890abcdef
-TG_CHANNEL=-1001234567890        
-TG_BOT_TOKEN=123456:ABCDEF-BOTTOKEN
+# Telegram (for bot mode)
+TELEGRAM_BOT_TOKEN=123456:ABCDEF-BOTTOKEN
 ```
 
 ### Copytrading Mode (Live Trading)
@@ -39,18 +41,9 @@ python main.py
 - Places mirrored trades using best market price
 - Sends Telegram alert on execution
 
-### Monitor-Only Mode (Alerts Only)
-```
-python test.py
-```
-
-- Sends Telegram notification for every new trade by tracked users
-- Does not place any orders
-
-
-Edit `tracked_wallets` in `utils/polymarket.py`:
-```
-tracked_wallets = {
+Edit tracked wallets in `main.py`:
+```python
+TARGETS: Dict[str,str] = {  # wallet -> name
     "0x1234...": "tommy",
     "0x5678...": "shelby",
     # Add more...
@@ -80,17 +73,24 @@ tracked_wallets = {
 - Bot must be added to your channel and granted Post Messages permission
 
 ## Directory Structure
-```polytrade/
+```
+polytrade/
 │
-├── main.py # Main copytrading loop (polls, filters, copies, notifies)
-├── test.py # Read-only trade listener (just Telegram alerts, no copying)
+├── main.py                   # Main copytrading loop
+├── bot.py                    # Telegram bot interface (multi-user)
+├── polymarket.py             # Polymarket CLOB client wrapper
 │
 ├── utils/
-│ ├── polymarket.py # Order posting, trade fetching, price querying (sync + SDK)
-│ └── telegram.py # Async Telegram bot interface (send_markdown)
+│   ├── polymarket_client.py  # Full Polymarket client implementation
+│   ├── user_manager.py       # Multi-user wallet management
+│   ├── account.py            # Polygon account utilities
+│   ├── telegram.py           # Async Telegram helpers
+│   ├── card.py               # Trading card generation
+│   └── ...                   # Other utilities
 │
-├── .env # API keys and secrets
-└── requirements.txt # Python dependencies```
+├── .env                      # API keys and secrets
+└── requirements.txt          # Python dependencies
+```
 
 
 
